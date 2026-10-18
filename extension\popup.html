@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+  <title>Bluesky Centrador</title>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" class="butterfly">
+            <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566 1.01 1 1.6 1 4.5c0 2.8 1.4 8.8 7.5 9.5-3.8 0-6.5 2-6.5 5 0 2.8 3.5 3.5 6.5 1 2.5-2 3.5-5 3.5-5s1 3 3.5 5c3 2.5 6.5 1.8 6.5-1 0-3-2.7-5-6.5-5 6.1-.7 7.5-6.7 7.5-9.5 0-2.9-1.566-3.49-4.202-1.695C16.046 4.747 13.087 8.686 12 10.8z"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Centrador Bluesky</h1>
+          <p class="subtitle">Espacios Braille invisibles (U+2800)</p>
+        </div>
+      </div>
+      <div id="charBadge" class="char-badge">
+        <span id="charCount">0</span>/300
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="field-group">
+        <label for="inputText" class="label">Texto a centrar:</label>
+        <textarea id="inputText" rows="3" placeholder="Escribe aquí tu texto... (soporta varias líneas)"></textarea>
+      </div>
+
+      <!-- Settings grid -->
+      <div class="controls-grid">
+        <!-- Vertical controls -->
+        <div class="card-box">
+          <div class="box-title">
+            <span>Saltos Verticales</span>
+            <span class="info-tag">1⠀ por salto</span>
+          </div>
+          <div class="stepper-row">
+            <span>Arriba:</span>
+            <div class="stepper">
+              <button id="btnTopMinus" class="step-btn">-</button>
+              <span id="linesTopVal" class="step-val">2</span>
+              <button id="btnTopPlus" class="step-btn">+</button>
+            </div>
+          </div>
+          <div class="stepper-row">
+            <span>Abajo:</span>
+            <div class="stepper">
+              <button id="btnBottomMinus" class="step-btn">-</button>
+              <span id="linesBottomVal" class="step-val">2</span>
+              <button id="btnBottomPlus" class="step-btn">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Horizontal controls -->
+        <div class="card-box">
+          <div class="box-title">
+            <span>Centrado Horizontal</span>
+            <span id="widthIndicator" class="info-tag">Ancho: 34</span>
+          </div>
+          <div class="btn-group">
+            <button id="btnAlignNone" class="toggle-btn">Izquierda</button>
+            <button id="btnAlignCenter" class="toggle-btn active">Centro</button>
+            <button id="btnAlignRelative" class="toggle-btn" title="Centra las líneas respecto a la más larga">Bloque</button>
+          </div>
+          <div class="slider-row">
+            <input type="range" id="widthSlider" min="20" max="46" value="34">
+          </div>
+        </div>
+      </div>
+
+      <!-- Typography Style Pills -->
+      <div class="style-row">
+        <span class="style-label">Estilo:</span>
+        <div class="style-pills">
+          <button id="styleNormal" class="pill active">Normal</button>
+          <button id="styleMono" class="pill font-mono">𝙼𝚘𝚗𝚘</button>
+          <button id="styleBold" class="pill font-bold">𝗡𝗲𝗴𝗿𝗶𝘁𝗮</button>
+          <button id="styleItalic" class="pill font-italic">𝘐𝘵á𝘭𝘪𝘤𝘢</button>
+        </div>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="preview-card">
+        <div class="preview-header">
+          <div class="avatar">BS</div>
+          <div class="user-meta">
+            <span class="name">Tu Cuenta</span>
+            <span class="handle">@usuario.bsky.social</span>
+          </div>
+        </div>
+        <div id="previewText" class="post-body"></div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="actions">
+        <button id="copyBtn" class="btn-primary">
+          <svg viewBox="0 0 24 24" class="btn-icon">
+            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="copyBtnLabel">Copiar para Bluesky</span>
+        </button>
+      </div>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

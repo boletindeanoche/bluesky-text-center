@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Centrador Bluesky</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0085ff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon192.png">
+  <style>
+    :root {
+      --bg: #0f141c;
+      --card: #161e2e;
+      --border: #243044;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #0085ff;
+      --primary-active: #006ed6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --muted: #64748b;
+        --primary: #0085ff;
+        --primary-active: #0070d8;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      user-select: none;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 2px;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      background: rgba(0, 133, 255, 0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-icon svg { width: 22px; height: 22px; fill: var(--primary); }
+    h1 { font-size: 16px; font-weight: 700; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+    }
+    .badge.warn { color: var(--warning); border-color: var(--warning); background: rgba(245, 158, 11, 0.1); }
+    .badge.error { color: var(--danger); border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    label.card-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 14px;
+      line-height: 1.4;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 70px;
+    }
+    textarea:focus { outline: none; border-color: var(--primary); }
+
+    /* Grid settings */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .setting-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .setting-title {
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+    }
+    .setting-title small { font-family: monospace; color: var(--primary); font-size: 10px; }
+    .stepper-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .stepper {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .step-btn {
+      width: 26px;
+      height: 26px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .step-val {
+      width: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .button-group {
+      display: flex;
+      gap: 4px;
+    }
+    .btn-toggle {
+      flex: 1;
+      padding: 6px 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-toggle.active {
+      background: rgba(0, 133, 255, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .range-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+    }
+    .range-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    /* Style Selector */
+    .style-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .pill {
+      flex: 1;
+      padding: 5px 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .pill.active {
+      background: rgba(0, 133, 255, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Preview */
+    .preview-feed {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0085ff, #8b5cf6);
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-info .u-name { font-size: 13px; font-weight: 700; }
+    .user-info .u-handle { font-size: 11px; color: var(--muted); }
+    .post-content {
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.45;
+      padding: 4px 8px;
+      border-left: 2px dashed rgba(0, 133, 255, 0.3);
+      min-height: 48px;
+      user-select: text;
+    }
+
+    /* Primary copy button */
+    .btn-copy {
+      width: 100%;
+      padding: 13px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 133, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+    .btn-copy:active { transform: scale(0.98); }
+    .btn-copy.copied {
+      background: var(--success);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    }
+    .btn-install {
+      display: none;
+      width: 100%;
+      padding: 8px;
+      background: rgba(0, 133, 255, 0.12);
+      border: 1px dashed var(--primary);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* Explanation */
+    .tip-box {
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--muted);
+      background: rgba(0, 133, 255, 0.06);
+      border: 1px solid rgba(0, 133, 255, 0.15);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .tip-box strong { color: var(--primary); }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566 1.01 1 1.6 1 4.5c0 2.8 1.4 8.8 7.5 9.5-3.8 0-6.5 2-6.5 5 0 2.8 3.5 3.5 6.5 1 2.5-2 3.5-5 3.5-5s1 3 3.5 5c3 2.5 6.5 1.8 6.5-1 0-3-2.7-5-6.5-5 6.1-.7 7.5-6.7 7.5-9.5 0-2.9-1.566-3.49-4.202-1.695C16.046 4.747 13.087 8.686 12 10.8z"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Centrador Bluesky</h1>
+          <div class="brand-sub">Espaciado Braille U+2800</div>
+        </div>
+      </div>
+      <div id="badge" class="badge">
+        <span id="charCount">0</span> / 300
+      </div>
+    </header>
+
+    <!-- Install PWA prompt -->
+    <button id="installBtn" class="btn-install">📱 Instalar como App en tu Móvil</button>
+
+    <!-- Input text -->
+    <div class="card">
+      <label class="card-label">
+        <span>Texto a centrar:</span>
+        <span style="cursor:pointer; color:var(--primary);" onclick="loadSample()">Cargar ejemplo</span>
+      </label>
+      <textarea id="inputText" rows="3" placeholder="Escribe aquí tu texto..."></textarea>
+    </div>
+
+    <!-- Controls -->
+    <div class="card grid-2">
+      <!-- Vertical -->
+      <div class="setting-box">
+        <div class="setting-title">
+          <span>Saltos Verticales</span>
+          <small>1⠀ por salto</small>
+        </div>
+        <div class="stepper-row">
+          <span>Arriba:</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="stepVal('top', -1)">-</button>
+            <span id="topVal" class="step-val">2</span>
+            <button class="step-btn" onclick="stepVal('top', 1)">+</button>
+          </div>
+        </div>
+        <div class="stepper-row">
+          <span>Abajo:</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="stepVal('bottom', -1)">-</button>
+            <span id="bottomVal" class="step-val">2</span>
+            <button class="step-btn" onclick="stepVal('bottom', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horizontal -->
+      <div class="setting-box">
+        <div class="setting-title">
+          <span>Centrado Horizontal</span>
+          <small id="colLabel">34 col</small>
+        </div>
+        <div class="button-group">
+          <button id="btnAlignNone" class="btn-toggle" onclick="setAlign('none')">Izquierda</button>
+          <button id="btnAlignCenter" class="btn-toggle active" onclick="setAlign('center')">Centro</button>
+          <button id="btnAlignRel" class="btn-toggle" onclick="setAlign('relative')">Bloque</button>
+        </div>
+        <div class="range-wrap">
+          <div class="range-label">
+            <span>Ancho post</span>
+            <span id="widthDisp">34</span>
+          </div>
+          <input type="range" id="widthRange" min="20" max="46" value="34" oninput="updateWidth(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Typography -->
+    <div class="card style-bar">
+      <span style="font-size:11px; font-weight:700; color:var(--muted);">Estilo:</span>
+      <button id="stNormal" class="pill active" onclick="setStyle('normal')">Normal</button>
+      <button id="stMono" class="pill" onclick="setStyle('mono')">𝙼𝚘𝚗𝚘</button>
+      <button id="stBold" class="pill" onclick="setStyle('bold')">𝗡𝗲𝗴𝗿𝗶𝘁𝗮</button>
+      <button id="stItalic" class="pill" onclick="setStyle('italic')">𝘐𝘵á𝘭𝘪𝘤𝘢</button>
+    </div>
+
+    <!-- Live Preview -->
+    <div class="card preview-feed">
+      <div class="preview-header">
+        <div class="avatar">BS</div>
+        <div class="user-info">
+          <div class="u-name">Tu Usuario</div>
+          <div class="u-handle">@usuario.bsky.social</div>
+        </div>
+      </div>
+      <div id="previewBox" class="post-content"></div>
+    </div>
+
+    <!-- Copy CTA -->
+    <button id="copyBtn" class="btn-copy" onclick="copyResult()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+      </svg>
+      <span id="copyLabel">Copiar para Bluesky</span>
+    </button>
+
+    <!-- Tips -->
+    <div class="tip-box">
+      <strong>💡 ¿Por qué funciona?</strong> Bluesky elimina espacios repetidos y líneas vacías estándar. Al usar el símbolo <code>U+2800</code> (Braille en blanco), la plataforma no lo considera espacio y nunca lo borra. Además, optimizamos para usar <strong>un único espacio Braille por línea vacía</strong>, ahorrando caracteres en tu límite de 300.
+    </div>
+  </div>
+
+  <script>
+    const BRAILLE = '\u2800';
+    let state = {
+      top: 2,
+      bottom: 2,
+      align: 'center',
+      width: 34,
+      style: 'normal'
+    };
+
+    const maps = {
+      mono: {
+        base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        target: '𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿'
+      },
+      bold: {
+        base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        target: '𝗮𝗯𝗰𝗱𝗲𝚏𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝙴𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵'
+      },
+      italic: {
+        base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        target: '𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
+      }
+    };
+
+    function convert(text, s) {
+      if (s === 'normal' || !maps[s]) return text;
+      const m = maps[s];
+      const b = Array.from(m.base);
+      const t = Array.from(m.target);
+      const dict = {};
+      b.forEach((char, i) => dict[char] = t[i]);
+      return Array.from(text).map(c => dict[c] || c).join('');
+    }
+
+    function visualLen(l) {
+      let w = 0;
+      for (const ch of l) {
+        if ('iljt1.,:;!\'|'.includes(ch)) w += 0.5;
+        else if ('WMm@%#QO'.includes(ch)) w += 1.35;
+        else if (ch === ' ' || ch === BRAILLE) w += 0.8;
+        else w += 1.0;
+      }
+      return w;
+    }
+
+    function generate() {
+      const raw = document.getElementById('inputText').value;
+      if (!raw.trim()) return '';
+
+      const lines = raw.split('\n');
+      const styled = lines.map(l => convert(l, state.style));
+
+      let res = [];
+      if (state.align === 'none') {
+        res = styled;
+      } else if (state.align === 'relative') {
+        const max = Math.max(...styled.map(l => visualLen(l)));
+        res = styled.map(l => {
+          if (!l.trim()) return '';
+          const diff = Math.max(0, (max - visualLen(l)) / 2);
+          return BRAILLE.repeat(Math.round(diff / 0.8)) + l;
+        });
+      } else {
+        res = styled.map(l => {
+          if (!l.trim()) return '';
+          const diff = Math.max(0, (state.width - visualLen(l)) / 2);
+          return BRAILLE.repeat(Math.round(diff / 0.8)) + l;
+        });
+      }
+
+      const topStr = state.top > 0 ? (BRAILLE + '\n').repeat(state.top) : '';
+      const botStr = state.bottom > 0 ? ('\n' + BRAILLE).repeat(state.bottom) : '';
+      return topStr + res.join('\n') + botStr;
+    }
+
+    function render() {
+      const out = generate();
+      const p = document.getElementById('previewBox');
+      p.textContent = out || '(Escribe tu texto arriba para previsualizar)';
+      p.style.opacity = out ? '1' : '0.5';
+
+      const count = Array.from(out).length;
+      const countEl = document.getElementById('charCount');
+      const badge = document.getElementById('badge');
+      countEl.textContent = count;
+
+      if (count > 300) {
+        badge.className = 'badge error';
+      } else if (count > 260) {
+        badge.className = 'badge warn';
+      } else {
+        badge.className = 'badge';
+      }
+    }
+
+    function stepVal(type, delta) {
+      if (type === 'top') {
+        state.top = Math.max(0, Math.min(8, state.top + delta));
+        document.getElementById('topVal').textContent = state.top;
+      } else {
+        state.bottom = Math.max(0, Math.min(8, state.bottom + delta));
+        document.getElementById('bottomVal').textContent = state.bottom;
+      }
+      render();
+    }
+
+    function setAlign(mode) {
+      state.align = mode;
+      ['btnAlignNone', 'btnAlignCenter', 'btnAlignRel'].forEach(id => {
+        document.getElementById(id).classList.remove('active');
+      });
+      const act = mode === 'none' ? 'btnAlignNone' : (mode === 'center' ? 'btnAlignCenter' : 'btnAlignRel');
+      document.getElementById(act).classList.add('active');
+      render();
+    }
+
+    function updateWidth(v) {
+      state.width = parseInt(v, 10);
+      document.getElementById('colLabel').textContent = `${v} col`;
+      document.getElementById('widthDisp').textContent = v;
+      render();
+    }
+
+    function setStyle(s) {
+      state.style = s;
+      ['stNormal', 'stMono', 'stBold', 'stItalic'].forEach(id => {
+        document.getElementById(id).classList.remove('active');
+      });
+      const cur = s === 'normal' ? 'stNormal' : (s === 'mono' ? 'stMono' : (s === 'bold' ? 'stBold' : 'stItalic'));
+      document.getElementById(cur).classList.add('active');
+      render();
+    }
+
+    function loadSample() {
+      document.getElementById('inputText').value = "CAPÍTULO I\nEl Despertar del Titán\n\nPróximamente";
+      render();
+    }
+
+    function copyResult() {
+      const text = generate();
+      if (!text) return;
+
+      if (navigator.vibrate) {
+        navigator.vibrate(40);
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const lbl = document.getElementById('copyLabel');
+        const old = lbl.textContent;
+        lbl.textContent = '¡Copiado con éxito!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          lbl.textContent = old;
+          btn.classList.remove('copied');
+        }, 1800);
+      }).catch(() => {
+        alert('Copiado!');
+      });
+    }
+
+    document.getElementById('inputText').addEventListener('input', render);
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(console.error);
+    }
+
+    // PWA install banner
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('installBtn');
+      btn.style.display = 'block';
+      btn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          btn.style.display = 'none';
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    loadSample();
+  </script>
+</body>
+</html>
