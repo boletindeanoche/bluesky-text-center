@@ -162,14 +162,14 @@
       cursor: pointer;
     }
     .step-val {
-      width: 20px;
+      width: 26px;
       text-align: center;
       font-weight: bold;
       font-size: 12px;
     }
     .button-group {
       display: flex;
-      gap: 4px;
+      gap: 3px;
     }
     .btn-toggle {
       flex: 1;
@@ -186,22 +186,6 @@
       background: rgba(0, 133, 255, 0.15);
       border-color: var(--primary);
       color: var(--primary);
-    }
-    .range-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-top: 4px;
-    }
-    .range-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--muted);
-    }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--primary);
     }
 
     /* Style Selector */
@@ -302,18 +286,6 @@
       cursor: pointer;
       text-align: center;
     }
-
-    /* Explanation */
-    .tip-box {
-      font-size: 11px;
-      line-height: 1.4;
-      color: var(--muted);
-      background: rgba(0, 133, 255, 0.06);
-      border: 1px solid rgba(0, 133, 255, 0.15);
-      border-radius: 10px;
-      padding: 10px;
-    }
-    .tip-box strong { color: var(--primary); }
     .creator-footer {
       text-align: center;
       font-size: 11px;
@@ -348,7 +320,7 @@
     <div class="card">
       <label class="card-label">
         <span>Texto a centrar:</span>
-        <span style="cursor:pointer; color:var(--primary);" onclick="loadSample()">Cargar ejemplo</span>
+        <span style="cursor:pointer; color:var(--primary); font-weight:600;" onclick="loadSample()">Cargar ejemplo</span>
       </label>
       <textarea id="inputText" rows="3" placeholder="Escribe aquí tu texto..."></textarea>
     </div>
@@ -383,19 +355,20 @@
       <div class="setting-box">
         <div class="setting-title">
           <span>Centrado Horizontal</span>
-          <small id="colLabel">34 col</small>
+          <small id="modeDisp">Móvil</small>
         </div>
         <div class="button-group">
-          <button id="btnAlignNone" class="btn-toggle" onclick="setAlign('none')">Izquierda</button>
-          <button id="btnAlignCenter" class="btn-toggle active" onclick="setAlign('center')">Centro</button>
-          <button id="btnAlignRel" class="btn-toggle" onclick="setAlign('relative')">Bloque</button>
+          <button id="btnMobile" class="btn-toggle active" onclick="setMode('mobile')">📱 Móvil</button>
+          <button id="btnPC" class="btn-toggle" onclick="setMode('pc')">💻 PC</button>
+          <button id="btnBlock" class="btn-toggle" onclick="setMode('block')">📄 Bloque</button>
         </div>
-        <div class="range-wrap">
-          <div class="range-label">
-            <span>Ancho post</span>
-            <span id="widthDisp">34</span>
+        <div class="stepper-row" style="margin-top:4px;">
+          <span>Ajuste fino:</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="stepNudge(-1)">-</button>
+            <span id="nudgeDisp" class="step-val">0</span>
+            <button class="step-btn" onclick="stepNudge(1)">+</button>
           </div>
-          <input type="range" id="widthRange" min="20" max="46" value="34" oninput="updateWidth(this.value)">
         </div>
       </div>
     </div>
@@ -429,8 +402,6 @@
       <span id="copyLabel">Copiar para Bluesky</span>
     </button>
 
-
-
     <div class="creator-footer">
       Creado por <strong>Anna Lightwood</strong>
     </div>
@@ -438,11 +409,23 @@
 
   <script>
     const BRAILLE = '\u2800';
+
+    // Canvas exact pixel measuring
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.font = '15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
+    function getPxWidth(text) {
+      return ctx.measureText(text).width;
+    }
+
+    const BRAILLE_PX = ctx.measureText(BRAILLE).width || 10.0;
+
     let state = {
       top: 2,
       bottom: 2,
-      align: 'center',
-      width: 34,
+      mode: 'mobile', // 'mobile' | 'pc' | 'block'
+      nudge: 0,
       style: 'normal'
     };
 
@@ -453,11 +436,11 @@
       },
       bold: {
         base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-        target: '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵'
+        target: '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝙴𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵'
       },
       italic: {
         base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        target: '𝘢𝘣𝘤𝘥𝘦𝚏𝚐𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
+        target: '𝘢𝘣𝘤𝘥𝚎𝚏𝚐𝘩𝘪𝘫𝚔𝘭𝘮𝘯𝘰𝚙𝘲𝘳𝘴𝘵𝘶𝚟𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝕎𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
       }
     };
 
@@ -471,17 +454,6 @@
       return Array.from(text).map(c => dict[c] || c).join('');
     }
 
-    function visualLen(l) {
-      let w = 0;
-      for (const ch of l) {
-        if ('iljt1.,:;!\'|'.includes(ch)) w += 0.5;
-        else if ('WMm@%#QO'.includes(ch)) w += 1.35;
-        else if (ch === ' ' || ch === BRAILLE) w += 0.8;
-        else w += 1.0;
-      }
-      return w;
-    }
-
     function generate() {
       const raw = document.getElementById('inputText').value;
       if (!raw.trim()) return '';
@@ -490,20 +462,23 @@
       const styled = lines.map(l => convert(l, state.style));
 
       let res = [];
-      if (state.align === 'none') {
-        res = styled;
-      } else if (state.align === 'relative') {
-        const max = Math.max(...styled.map(l => visualLen(l)));
+      if (state.mode === 'block') {
+        const maxPx = Math.max(...styled.map(l => getPxWidth(l)));
         res = styled.map(l => {
           if (!l.trim()) return '';
-          const diff = Math.max(0, (max - visualLen(l)) / 2);
-          return BRAILLE.repeat(Math.round(diff / 0.8)) + l;
+          const linePx = getPxWidth(l);
+          const diffPx = Math.max(0, (maxPx - linePx) / 2);
+          const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + state.nudge);
+          return BRAILLE.repeat(count) + l;
         });
       } else {
+        const targetPx = state.mode === 'pc' ? 520 : 320;
         res = styled.map(l => {
           if (!l.trim()) return '';
-          const diff = Math.max(0, (state.width - visualLen(l)) / 2);
-          return BRAILLE.repeat(Math.round(diff / 0.8)) + l;
+          const linePx = getPxWidth(l);
+          const diffPx = Math.max(0, (targetPx - linePx) / 2);
+          const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + state.nudge);
+          return BRAILLE.repeat(count) + l;
         });
       }
 
@@ -543,20 +518,20 @@
       render();
     }
 
-    function setAlign(mode) {
-      state.align = mode;
-      ['btnAlignNone', 'btnAlignCenter', 'btnAlignRel'].forEach(id => {
+    function setMode(mode) {
+      state.mode = mode;
+      ['btnMobile', 'btnPC', 'btnBlock'].forEach(id => {
         document.getElementById(id).classList.remove('active');
       });
-      const act = mode === 'none' ? 'btnAlignNone' : (mode === 'center' ? 'btnAlignCenter' : 'btnAlignRel');
-      document.getElementById(act).classList.add('active');
+      const actId = mode === 'mobile' ? 'btnMobile' : (mode === 'pc' ? 'btnPC' : 'btnBlock');
+      document.getElementById(actId).classList.add('active');
+      document.getElementById('modeDisp').textContent = mode === 'mobile' ? 'Móvil' : (mode === 'pc' ? 'PC' : 'Bloque');
       render();
     }
 
-    function updateWidth(v) {
-      state.width = parseInt(v, 10);
-      document.getElementById('colLabel').textContent = `${v} col`;
-      document.getElementById('widthDisp').textContent = v;
+    function stepNudge(delta) {
+      state.nudge = Math.max(-10, Math.min(15, state.nudge + delta));
+      document.getElementById('nudgeDisp').textContent = state.nudge > 0 ? `+${state.nudge}` : state.nudge;
       render();
     }
 
@@ -621,6 +596,7 @@
       });
     });
 
+    // Start with empty input
     render();
   </script>
 </body>
