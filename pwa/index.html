@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Centrador Bluesky</title>
+  <title>Centrador Bluesky - Anna Lightwood</title>
   <link rel="manifest" href="manifest.json">
+  <meta name="author" content="Anna Lightwood">
   <meta name="theme-color" content="#0085ff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -313,6 +314,12 @@
       padding: 10px;
     }
     .tip-box strong { color: var(--primary); }
+    .creator-footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 4px 0 10px;
+    }
   </style>
 </head>
 <body>
@@ -326,7 +333,7 @@
         </div>
         <div>
           <h1>Centrador Bluesky</h1>
-          <div class="brand-sub">Espaciado Braille U+2800</div>
+          <div class="brand-sub">Por Anna Lightwood · Braille U+2800</div>
         </div>
       </div>
       <div id="badge" class="badge">
@@ -405,10 +412,10 @@
     <!-- Live Preview -->
     <div class="card preview-feed">
       <div class="preview-header">
-        <div class="avatar">BS</div>
+        <div class="avatar">AL</div>
         <div class="user-info">
-          <div class="u-name">Tu Usuario</div>
-          <div class="u-handle">@usuario.bsky.social</div>
+          <div class="u-name">Anna Lightwood</div>
+          <div class="u-handle">@annalightwood.bsky.social</div>
         </div>
       </div>
       <div id="previewBox" class="post-content"></div>
@@ -425,6 +432,10 @@
     <!-- Tips -->
     <div class="tip-box">
       <strong>💡 ¿Por qué funciona?</strong> Bluesky elimina espacios repetidos y líneas vacías estándar. Al usar el símbolo <code>U+2800</code> (Braille en blanco), la plataforma no lo considera espacio y nunca lo borra. Además, optimizamos para usar <strong>un único espacio Braille por línea vacía</strong>, ahorrando caracteres en tu límite de 300.
+    </div>
+
+    <div class="creator-footer">
+      Creado por <strong>Anna Lightwood</strong>
     </div>
   </div>
 
@@ -445,11 +456,11 @@
       },
       bold: {
         base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-        target: '𝗮𝗯𝗰𝗱𝗲𝚏𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝙴𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵'
+        target: '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵'
       },
       italic: {
         base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        target: '𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
+        target: '𝘢𝘣𝘤𝘥𝘦𝚏𝚐𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
       }
     };
 
