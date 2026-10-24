@@ -1,10 +1,22 @@
 const BRAILLE_SPACE = '\u2800'; // U+2800 invisible braille blank
 
+// Create off-screen canvas to measure exact pixel widths with Bluesky font metrics
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+ctx.font = '15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
+function getTextWidth(text) {
+  return ctx.measureText(text).width;
+}
+
+// Measured width of 1 braille space in px (typically 10.0px)
+const BRAILLE_PX = ctx.measureText(BRAILLE_SPACE).width || 10.0;
+
 const config = {
   linesTop: 2,
   linesBottom: 2,
-  align: 'center', // 'none' | 'center' | 'relative'
-  targetWidth: 34,
+  mode: 'mobile', // 'mobile' (320px) | 'pc' (520px) | 'block'
+  nudge: 0,
   style: 'normal'
 };
 
@@ -19,7 +31,7 @@ const unicodeMaps = {
   },
   italic: {
     base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    target: '𝘢𝘣𝘤𝘥𝘦𝚏𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
+    target: '𝘢𝘣𝘤𝘥𝚎𝚏𝚐𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝚙𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
   }
 };
 
@@ -34,17 +46,6 @@ function convertChars(text, style) {
   return Array.from(text).map(ch => dict[ch] || ch).join('');
 }
 
-function getVisualLength(line) {
-  let w = 0;
-  for (const ch of line) {
-    if ('iljt1.,:;!\'|'.includes(ch)) w += 0.5;
-    else if ('WMm@%#QO'.includes(ch)) w += 1.35;
-    else if (ch === ' ' || ch === BRAILLE_SPACE) w += 0.8;
-    else w += 1.0;
-  }
-  return w;
-}
-
 function generateFormattedText() {
   const rawInput = document.getElementById('inputText').value;
   if (!rawInput.trim()) return '';
@@ -53,27 +54,30 @@ function generateFormattedText() {
   const styledLines = lines.map(line => convertChars(line, config.style));
 
   let formattedLines = [];
-  if (config.align === 'none') {
-    formattedLines = [...styledLines];
-  } else if (config.align === 'relative') {
-    const maxWidth = Math.max(...styledLines.map(l => getVisualLength(l)));
+
+  if (config.mode === 'block') {
+    // Center each line relative to the longest line in the user's text
+    const maxPx = Math.max(...styledLines.map(l => getTextWidth(l)));
     formattedLines = styledLines.map(l => {
       if (!l.trim()) return '';
-      const lineW = getVisualLength(l);
-      const diff = Math.max(0, (maxWidth - lineW) / 2);
-      const brailleCount = Math.round(diff / 0.8);
-      return BRAILLE_SPACE.repeat(brailleCount) + l;
+      const linePx = getTextWidth(l);
+      const diffPx = Math.max(0, (maxPx - linePx) / 2);
+      const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + config.nudge);
+      return BRAILLE_SPACE.repeat(count) + l;
     });
   } else {
+    // Mode is 'mobile' (~320px) or 'pc' (~520px)
+    const targetPx = config.mode === 'pc' ? 520 : 320;
     formattedLines = styledLines.map(l => {
       if (!l.trim()) return '';
-      const lineW = getVisualLength(l);
-      const diff = Math.max(0, (config.targetWidth - lineW) / 2);
-      const brailleCount = Math.round(diff / 0.8);
-      return BRAILLE_SPACE.repeat(brailleCount) + l;
+      const linePx = getTextWidth(l);
+      const diffPx = Math.max(0, (targetPx - linePx) / 2);
+      const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + config.nudge);
+      return BRAILLE_SPACE.repeat(count) + l;
     });
   }
 
+  // 1 braille space per blank line protects the newline from being stripped
   const topPadding = config.linesTop > 0 ? (BRAILLE_SPACE + '\n').repeat(config.linesTop) : '';
   const bottomPadding = config.linesBottom > 0 ? ('\n' + BRAILLE_SPACE).repeat(config.linesBottom) : '';
 
@@ -85,7 +89,7 @@ function render() {
   const preview = document.getElementById('previewText');
   
   if (!formatted) {
-    preview.textContent = '(Escribe arriba para ver la vista previa)';
+    preview.textContent = '(Escribe arriba para ver la vista previa centrada)';
     preview.className = 'post-body empty';
   } else {
     preview.textContent = formatted;
@@ -111,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const input = document.getElementById('inputText');
   input.addEventListener('input', render);
 
-  // Steppers
+  // Steppers vertical
   document.getElementById('btnTopMinus').addEventListener('click', () => {
     config.linesTop = Math.max(0, config.linesTop - 1);
     document.getElementById('linesTopVal').textContent = config.linesTop;
@@ -134,27 +138,36 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
   });
 
-  // Alignment buttons
-  const alignBtns = {
-    none: document.getElementById('btnAlignNone'),
-    center: document.getElementById('btnAlignCenter'),
-    relative: document.getElementById('btnAlignRelative')
+  // Mode buttons (Mobile, PC, Block)
+  const modeBtns = {
+    mobile: document.getElementById('btnAlignMobile'),
+    pc: document.getElementById('btnAlignPC'),
+    block: document.getElementById('btnAlignBlock')
   };
 
-  Object.entries(alignBtns).forEach(([mode, btn]) => {
+  const indicator = document.getElementById('targetIndicator');
+
+  Object.entries(modeBtns).forEach(([m, btn]) => {
     btn.addEventListener('click', () => {
-      config.align = mode;
-      Object.values(alignBtns).forEach(b => b.classList.remove('active'));
+      config.mode = m;
+      Object.values(modeBtns).forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      if (m === 'mobile') indicator.textContent = 'Móvil';
+      else if (m === 'pc') indicator.textContent = 'PC';
+      else indicator.textContent = 'Bloque';
       render();
     });
   });
 
-  // Width slider
-  const slider = document.getElementById('widthSlider');
-  slider.addEventListener('input', (e) => {
-    config.targetWidth = parseInt(e.target.value, 10);
-    document.getElementById('widthIndicator').textContent = `Ancho: ${config.targetWidth}`;
+  // Nudge stepper (- / + spaces)
+  document.getElementById('btnNudgeMinus').addEventListener('click', () => {
+    config.nudge = Math.max(-10, config.nudge - 1);
+    document.getElementById('nudgeVal').textContent = config.nudge > 0 ? `+${config.nudge}` : config.nudge;
+    render();
+  });
+  document.getElementById('btnNudgePlus').addEventListener('click', () => {
+    config.nudge = Math.min(15, config.nudge + 1);
+    document.getElementById('nudgeVal').textContent = config.nudge > 0 ? `+${config.nudge}` : config.nudge;
     render();
   });
 
@@ -217,5 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Initial render (starts empty)
   render();
 });
