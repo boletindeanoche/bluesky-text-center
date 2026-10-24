@@ -15,11 +15,11 @@ const unicodeMaps = {
   },
   bold: {
     base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-    target: '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵'
+    target: '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝙴𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝙼𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵'
   },
   italic: {
     base: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    target: '𝘢𝘣𝘤𝘥𝘦𝗳𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
+    target: '𝘢𝘣𝘤𝘥𝘦𝚏𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝗤𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡'
   }
 };
 
@@ -74,7 +74,6 @@ function generateFormattedText() {
     });
   }
 
-  // 1 braille space per blank line is enough to protect it from being stripped
   const topPadding = config.linesTop > 0 ? (BRAILLE_SPACE + '\n').repeat(config.linesTop) : '';
   const bottomPadding = config.linesBottom > 0 ? ('\n' + BRAILLE_SPACE).repeat(config.linesBottom) : '';
 
@@ -176,6 +175,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Sample button
+  const sampleBtn = document.getElementById('loadSampleBtn');
+  if (sampleBtn) {
+    sampleBtn.addEventListener('click', () => {
+      document.getElementById('inputText').value = "CAPÍTULO I\nEl Despertar del Titán\n\nPróximamente";
+      render();
+    });
+  }
+
   // Copy button
   const copyBtn = document.getElementById('copyBtn');
   const copyBtnLabel = document.getElementById('copyBtnLabel');
@@ -194,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1800);
     }).catch(err => {
       console.error(err);
-      // Fallback
       const ta = document.createElement('textarea');
       ta.value = text;
       document.body.appendChild(ta);
