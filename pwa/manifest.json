@@ -1,7 +1,11 @@
 {
   "name": "Centrador de Texto para Bluesky",
   "short_name": "BSky Center",
-  "description": "Centra texto vertical y horizontalmente en posts de Bluesky usando espacios Braille invisibles (U+2800)",
+  "description": "Centra texto vertical y horizontalmente en posts de Bluesky usando espacios Braille invisibles (U+2800). Creado por Anna Lightwood.",
+  "author": "Anna Lightwood",
+  "developer": {
+    "name": "Anna Lightwood"
+  },
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
