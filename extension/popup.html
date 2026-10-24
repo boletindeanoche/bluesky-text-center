@@ -65,15 +65,20 @@
         <div class="card-box">
           <div class="box-title">
             <span>Centrado Horizontal</span>
-            <span id="widthIndicator" class="info-tag">Ancho: 34</span>
+            <span id="targetIndicator" class="info-tag">Móvil</span>
           </div>
           <div class="btn-group">
-            <button id="btnAlignNone" class="toggle-btn">Izquierda</button>
-            <button id="btnAlignCenter" class="toggle-btn active">Centro</button>
-            <button id="btnAlignRelative" class="toggle-btn" title="Centra las líneas respecto a la más larga">Bloque</button>
+            <button id="btnAlignMobile" class="toggle-btn active" title="Para el feed de la app en móvil (~320px)">📱 Móvil</button>
+            <button id="btnAlignPC" class="toggle-btn" title="Para la web en PC (~520px)">💻 PC</button>
+            <button id="btnAlignBlock" class="toggle-btn" title="Centra las líneas cortas respecto a la más larga">📄 Bloque</button>
           </div>
-          <div class="slider-row">
-            <input type="range" id="widthSlider" min="20" max="46" value="34">
+          <div class="stepper-row" style="margin-top:6px;">
+            <span>Ajuste fino:</span>
+            <div class="stepper">
+              <button id="btnNudgeMinus" class="step-btn">-</button>
+              <span id="nudgeVal" class="step-val">0</span>
+              <button id="btnNudgePlus" class="step-btn">+</button>
+            </div>
           </div>
         </div>
       </div>
