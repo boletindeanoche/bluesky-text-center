@@ -55,27 +55,15 @@ function generateFormattedText() {
 
   let formattedLines = [];
 
-  if (config.mode === 'block') {
-    // Center each line relative to the longest line in the user's text
-    const maxPx = Math.max(...styledLines.map(l => getTextWidth(l)));
-    formattedLines = styledLines.map(l => {
-      if (!l.trim()) return '';
-      const linePx = getTextWidth(l);
-      const diffPx = Math.max(0, (maxPx - linePx) / 2);
-      const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + config.nudge);
-      return BRAILLE_SPACE.repeat(count) + l;
-    });
-  } else {
-    // Mode is 'mobile' (~320px) or 'pc' (~520px)
-    const targetPx = config.mode === 'pc' ? 520 : 320;
-    formattedLines = styledLines.map(l => {
-      if (!l.trim()) return '';
-      const linePx = getTextWidth(l);
-      const diffPx = Math.max(0, (targetPx - linePx) / 2);
-      const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + config.nudge);
-      return BRAILLE_SPACE.repeat(count) + l;
-    });
-  }
+  // Mode is 'mobile' (~320px) or 'pc' (~520px)
+  const targetPx = config.mode === 'pc' ? 520 : 320;
+  formattedLines = styledLines.map(l => {
+    if (!l.trim()) return '';
+    const linePx = getTextWidth(l);
+    const diffPx = Math.max(0, (targetPx - linePx) / 2);
+    const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + config.nudge);
+    return BRAILLE_SPACE.repeat(count) + l;
+  });
 
   // 1 braille space per blank line protects the newline from being stripped
   const topPadding = config.linesTop > 0 ? (BRAILLE_SPACE + '\n').repeat(config.linesTop) : '';
@@ -138,11 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
   });
 
-  // Mode buttons (Mobile, PC, Block)
+  // Mode buttons (Mobile, PC)
   const modeBtns = {
     mobile: document.getElementById('btnAlignMobile'),
-    pc: document.getElementById('btnAlignPC'),
-    block: document.getElementById('btnAlignBlock')
+    pc: document.getElementById('btnAlignPC')
   };
 
   const indicator = document.getElementById('targetIndicator');
@@ -152,9 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
       config.mode = m;
       Object.values(modeBtns).forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      if (m === 'mobile') indicator.textContent = 'Móvil';
-      else if (m === 'pc') indicator.textContent = 'PC';
-      else indicator.textContent = 'Bloque';
+      indicator.textContent = m === 'mobile' ? 'Móvil' : 'PC';
       render();
     });
   });

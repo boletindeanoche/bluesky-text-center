@@ -358,7 +358,6 @@
         <div class="button-group">
           <button id="btnMobile" class="btn-toggle active" onclick="setMode('mobile')">📱 Móvil</button>
           <button id="btnPC" class="btn-toggle" onclick="setMode('pc')">💻 PC</button>
-          <button id="btnBlock" class="btn-toggle" onclick="setMode('block')">📄 Bloque</button>
         </div>
         <div class="stepper-row" style="margin-top:4px;">
           <span>Ajuste fino:</span>
@@ -459,26 +458,14 @@
       const lines = raw.split('\n');
       const styled = lines.map(l => convert(l, state.style));
 
-      let res = [];
-      if (state.mode === 'block') {
-        const maxPx = Math.max(...styled.map(l => getPxWidth(l)));
-        res = styled.map(l => {
-          if (!l.trim()) return '';
-          const linePx = getPxWidth(l);
-          const diffPx = Math.max(0, (maxPx - linePx) / 2);
-          const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + state.nudge);
-          return BRAILLE.repeat(count) + l;
-        });
-      } else {
-        const targetPx = state.mode === 'pc' ? 520 : 320;
-        res = styled.map(l => {
-          if (!l.trim()) return '';
-          const linePx = getPxWidth(l);
-          const diffPx = Math.max(0, (targetPx - linePx) / 2);
-          const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + state.nudge);
-          return BRAILLE.repeat(count) + l;
-        });
-      }
+      const targetPx = state.mode === 'pc' ? 520 : 320;
+      let res = styled.map(l => {
+        if (!l.trim()) return '';
+        const linePx = getPxWidth(l);
+        const diffPx = Math.max(0, (targetPx - linePx) / 2);
+        const count = Math.max(0, Math.round(diffPx / BRAILLE_PX) + state.nudge);
+        return BRAILLE.repeat(count) + l;
+      });
 
       const topStr = state.top > 0 ? (BRAILLE + '\n').repeat(state.top) : '';
       const botStr = state.bottom > 0 ? ('\n' + BRAILLE).repeat(state.bottom) : '';
@@ -518,12 +505,12 @@
 
     function setMode(mode) {
       state.mode = mode;
-      ['btnMobile', 'btnPC', 'btnBlock'].forEach(id => {
+      ['btnMobile', 'btnPC'].forEach(id => {
         document.getElementById(id).classList.remove('active');
       });
-      const actId = mode === 'mobile' ? 'btnMobile' : (mode === 'pc' ? 'btnPC' : 'btnBlock');
+      const actId = mode === 'mobile' ? 'btnMobile' : 'btnPC';
       document.getElementById(actId).classList.add('active');
-      document.getElementById('modeDisp').textContent = mode === 'mobile' ? 'Móvil' : (mode === 'pc' ? 'PC' : 'Bloque');
+      document.getElementById('modeDisp').textContent = mode === 'mobile' ? 'Móvil' : 'PC';
       render();
     }
 
