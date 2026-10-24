@@ -318,7 +318,6 @@
     <div class="card">
       <label class="card-label">
         <span>Texto a centrar:</span>
-        <span style="cursor:pointer; color:var(--primary); font-weight:600;" onclick="loadSample()">Cargar ejemplo</span>
       </label>
       <textarea id="inputText" rows="3" placeholder="Escribe aquí tu texto..."></textarea>
     </div>
@@ -530,10 +529,6 @@
       render();
     }
 
-    function loadSample() {
-      document.getElementById('inputText').value = "CAPÍTULO I\nEl Despertar del Titán\n\nPróximamente";
-      render();
-    }
 
     function copyResult() {
       const text = generate();

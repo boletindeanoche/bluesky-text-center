@@ -173,14 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Sample button
-  const sampleBtn = document.getElementById('loadSampleBtn');
-  if (sampleBtn) {
-    sampleBtn.addEventListener('click', () => {
-      document.getElementById('inputText').value = "CAPÍTULO I\nEl Despertar del Titán\n\nPróximamente";
-      render();
-    });
-  }
 
   // Copy button
   const copyBtn = document.getElementById('copyBtn');

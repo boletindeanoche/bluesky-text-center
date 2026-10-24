@@ -9,10 +9,10 @@ Desarrollado y diseñado por **Anna Lightwood**.
 
 ---
 
-## 📥 Descargas Directas (Versión v1.0.5)
+## 📥 Descargas Directas (Versión v1.0.6)
 
-- 📱 **[Descargar CentradorBluesky.apk](https://github.com/boletindeanoche/bluesky-text-center/releases/download/v1.0.5/CentradorBluesky.apk)** (App directa para instalar en Android)
-- 🧩 **[Descargar extension-chrome.zip](https://github.com/boletindeanoche/bluesky-text-center/releases/download/v1.0.5/extension-chrome.zip)** (Extensión empaquetada para Google Chrome)
+- 📱 **[Descargar CentradorBluesky.apk](https://github.com/boletindeanoche/bluesky-text-center/releases/download/v1.0.6/CentradorBluesky.apk)** (App directa para instalar en Android)
+- 🧩 **[Descargar extension-chrome.zip](https://github.com/boletindeanoche/bluesky-text-center/releases/download/v1.0.6/extension-chrome.zip)** (Extensión empaquetada para Google Chrome)
 
 ---
 
